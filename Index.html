@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>For Aditi 💖</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@600;700&display=swap" rel="stylesheet">
+
+<style>
+body{
+    margin:0;
+    padding:0;
+    overflow:hidden;
+    font-family:'Dancing Script', cursive;
+    background:linear-gradient(135deg,#ff9ec4,#ffc1d6,#ffe4f2);
+    height:100vh;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+}
+.page{
+    position:absolute;
+    width:100%;
+    height:100%;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    flex-direction:column;
+}
+.card{
+    background:rgba(255,255,255,0.25);
+    padding:60px 40px;
+    border-radius:28px;
+    width:90%;
+    max-width:600px;
+    border:1px solid rgba(255,255,255,0.3);
+    box-shadow:0 15px 35px rgba(0,0,0,0.12);
+    text-align:center;
+}
+h1{
+    font-size:32px;
+    color:#a60055;
+    line-height:1.6;
+}
+.button-group{
+    margin-top:35px;
+    display:flex;
+    gap:30px;
+    justify-content:center;
+    position:relative;
+}
+button{
+    padding:14px 35px;
+    font-size:22px;
+    border:none;
+    border-radius:30px;
+    cursor:pointer;
+    transition:0.3s ease;
+    font-family:'Dancing Script', cursive;
+    z-index:10;
+}
+#yesBtn{
+    background:linear-gradient(45deg,#ff4d88,#ff0066);
+    color:white;
+}
+#noBtn{
+    background:#444;
+    color:white;
+    position:relative;
+}
+.popup{
+    position:fixed;
+    top:25%;
+    left:50%;
+    transform:translateX(-50%);
+    background:white;
+    padding:18px 28px;
+    border-radius:20px;
+    font-size:20px;
+    box-shadow:0 8px 25px rgba(0,0,0,0.25);
+    transition:opacity 3s ease;
+    z-index:1000;
+    opacity:0;
+}
+.overlay{
+    position:fixed;
+    top:0;
+    left:0;
+    width:100%;
+    height:100%;
+    background:rgba(0,0,0,0.15);
+    z-index:900;
+    display:none;
+}
+.fall{
+    position:fixed;
+    top:-30px;
+    font-size:24px;
+    animation:fall linear infinite;
+    pointer-events:none;
+}
+@keyframes fall{
+    0%{ transform:translateY(-10vh) rotate(0deg); opacity:1;}
+    100%{ transform:translateY(110vh) rotate(360deg); opacity:0.9;}
+}
+.heart-burst{
+    position:fixed;
+    font-size:32px;
+    animation:burst 0.8s forwards;
+    pointer-events:none;
+    z-index:2000;
+}
+@keyframes burst{
+    0%{ transform:scale(0) translateY(0); opacity:1;}
+    50%{ transform:scale(1.5) translateY(-20px); opacity:1;}
+    100%{ transform:scale(1) translateY(-50px); opacity:0;}
+}
+.hidden{ display:none; }
+#loveText{
+    font-size:30px;
+    color:#a60055;
+    white-space:pre-line;
+    line-height:1.6;
+}
+</style>
+</head>
+
+<body>
+
+<div class="overlay" id="overlay"></div>
+
+<div class="page" id="page1">
+    <div class="card">
+        <h1>
+            Hey Aditi 💖,<br><br>
+            I know you see me as just a friend…<br>
+            But I still wanted to ask you something from my heart.<br><br>
+            <b>Will you be my Valentine?</b>
+        </h1>
+
+        <div class="button-group">
+            <button id="yesBtn">YES 💖</button>
+            <button id="noBtn">NO 🥺</button>
+        </div>
+    </div>
+</div>
+
+<div class="page hidden" id="page2">
+    <div class="card">
+        <h1 id="loveText"></h1>
+    </div>
+</div>
+
+<div class="popup" id="popup"></div>
+
+<script>
+const noBtn=document.getElementById("noBtn");
+const yesBtn=document.getElementById("yesBtn");
+const popup=document.getElementById("popup");
+const overlay=document.getElementById("overlay");
+const page1=document.getElementById("page1");
+const page2=document.getElementById("page2");
+
+// 🔐 TELEGRAM CONFIG
+const BOT_TOKEN = "8208526454:AAGuTtgz5BC-RtxNGCmshWb4xiX9xo_3rIo";
+const CHAT_ID = "662177857";
+
+function sendTelegram(message){
+    fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
+        method:"POST",
+        headers: {"Content-Type":"application/json"},
+        body: JSON.stringify({chat_id: CHAT_ID, text: message})
+    }).catch(err=>console.log("Telegram Error:", err));
+}
+
+// 💾 Persistent NO click counter
+let noCount = localStorage.getItem("noCount") 
+    ? parseInt(localStorage.getItem("noCount")) 
+    : 0;
+
+const cuteLines=[
+"Seriously Aditi… do you really want to break my heart? 💔",
+"One 'No' and my heart might actually cry 🥺",
+"Aditi please… don’t do this to me 😭",
+"Are you sure? My heart already chose you 💕",
+"That 'No' button doesn’t look right on you 😌",
+"Come on… just one sweet YES ❤️"
+];
+
+function showPopup(text,duration=3000){
+    popup.innerHTML=text;
+    popup.style.opacity="1";
+    overlay.style.display="block";
+    setTimeout(()=>{
+        popup.style.opacity="0";
+        setTimeout(()=>overlay.style.display="none", duration);
+    }, duration);
+}
+
+function moveNo(){
+    const maxX=window.innerWidth-noBtn.offsetWidth-10;
+    const maxY=window.innerHeight-noBtn.offsetHeight-10;
+    noBtn.style.position="fixed";
+    noBtn.style.left=Math.random()*maxX+"px";
+    noBtn.style.top=Math.random()*maxY+"px";
+}
+
+// ❌ NO CLICK
+noBtn.addEventListener("click",()=>{
+    noCount++;
+    localStorage.setItem("noCount", noCount);
+
+    moveNo();
+    showPopup(cuteLines[Math.floor(Math.random()*cuteLines.length)]);
+
+    sendTelegram(`Aditi clicked NO 🥺
+Total NO clicks: ${noCount}`);
+});
+
+// ✅ YES CLICK
+yesBtn.addEventListener("click",()=>{
+    page1.classList.add("hidden");
+    page2.classList.remove("hidden");
+    showPopup("You just made me the happiest person alive 💖", 4000);
+    createHeartBurst();
+    typeWriter();
+
+    sendTelegram(`Aditi clicked YES 💖
+Total NO clicks before YES: ${noCount}`);
+});
+
+function createHeartBurst(){
+    const heart=document.createElement("div");
+    heart.classList.add("heart-burst");
+    heart.innerHTML="💖";
+    const rect=yesBtn.getBoundingClientRect();
+    heart.style.left=(rect.left + rect.width/2 - 16)+"px";
+    heart.style.top=(rect.top - 10)+"px";
+    document.body.appendChild(heart);
+    setTimeout(()=>heart.remove(),800);
+}
+
+const message="💞 I knew you would say yes. 💞\n\nThank you for making this moment truly special, Aditi ❤️";
+let i=0;
+function typeWriter(){
+    if(i<message.length){
+        document.getElementById("loveText").innerHTML+=message.charAt(i);
+        i++;
+        setTimeout(typeWriter,50);
+    }
+}
+
+function petals(speed){
+    setInterval(()=>{
+        const symbols=["🌹","🌸","💖","💗"];
+        const el=document.createElement("div");
+        el.classList.add("fall");
+        el.innerHTML=symbols[Math.floor(Math.random()*symbols.length)];
+        el.style.left=Math.random()*100+"vw";
+        el.style.animationDuration=speed+"s";
+        document.body.appendChild(el);
+        setTimeout(()=>el.remove(),speed*1000);
+    },800);
+}
+
+petals(8);
+yesBtn.addEventListener("click",()=>{ petals(5); });
+</script>
+
+</body>
+</html>
